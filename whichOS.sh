@@ -27,12 +27,14 @@ ips="$(/sbin/arp-scan -I ens33 --localnet --ignoredups | grep "^$firstNumOfIp" |
 # For loop for describing the Os associated
 
 for ip in $ips; do
-  ttl="$(ping -c 1 192.168.18.1 | grep ttl | awk '{print $6}' | awk -F "=" '{print $2}')"
-  if [ $ttl -eq 64 ];then
+  ttl="$(ping -c 1 $ip | grep ttl | awk '{print $6}' | awk -F "=" '{print $2}')"
+  if [[ -z "$ttl" ]]; then
+    echo -e "\n${grayColour}[?] The ip ($ip) did not respond${endColour}"
+  elif [[ $ttl -eq 64 ]];then
     echo -e "\n${grayColour}[+] The ip ${endColour}${greenColour}($ip)${endColour}${grayColour} has${endColour} ${yellowColour}Linux or MacOs${endColour} ${grayColour}as its OS${endColour}" 
-  elif [ $ttl -eq 128 ]; then
+  elif [[ $ttl -eq 128 ]]; then
     echo -e "\n${grayColour}[+] The ip ${endColour}${greenColour}($ip)${endColour}${grayColour} has${endColour} ${yellowColour}Windows${endColour} ${grayColour}as its OS${endColour}" 
-  elif [ $ttl -eq 254 ]; then
+  elif [[ $ttl -eq 254 ]]; then
     echo -e "\n${grayColour}[+] The ip ${endColour}${greenColour}($ip)${endColour}${grayColour} has${endColour} ${yellowColour}Solaris or AIX${endColour} ${grayColour}as its OS${endColour}" 
   else
     echo -e "\n${grayColour}[?] The ip ($ip) has an irregular ttl${endColour}"
